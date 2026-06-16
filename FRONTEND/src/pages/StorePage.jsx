@@ -25,7 +25,12 @@ const StorePage = ({ setCurrentView }) => {
   useEffect(() => {
     const fetchFlavors = async () => {
       try {
-        const res = await fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/sabores');
+        // AQUÍ ESTÁ LA CORRECCIÓN: Agregué el header ngrok-skip-browser-warning
+        const res = await fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/sabores', {
+          headers: {
+            'ngrok-skip-browser-warning': 'true'
+          }
+        });
         const data = await res.json();
         if (Array.isArray(data)) {
           setFlavors(data);
@@ -66,7 +71,10 @@ const StorePage = ({ setCurrentView }) => {
     try {
       await fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/ventas', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true'
+        },
         body: JSON.stringify({ items: cart })
       });
     } catch (error) {
@@ -77,7 +85,7 @@ const StorePage = ({ setCurrentView }) => {
     cart.forEach(item => msg += `▫️ ${item.quantity}x ${item.name}\n`);
     msg += `\n*TOTAL: ${getCartTotal()} Bs.*\nMétodo: *${paymentMethod === 'qr' ? 'Código QR' : 'Efectivo'}*`;
     
-    window.open(`https://wa.me/59171277172encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://wa.me/59171277172?text=${encodeURIComponent(msg)}`, '_blank');
     setCart([]);
     setIsOrderModalOpen(false);
   };

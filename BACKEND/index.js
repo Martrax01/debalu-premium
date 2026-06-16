@@ -11,6 +11,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning']
 }));
 
+app.options(/.*/, cors());
 app.use(express.json());
 
 const db = mysql.createConnection({

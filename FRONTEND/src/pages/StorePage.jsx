@@ -25,7 +25,7 @@ const StorePage = ({ setCurrentView }) => {
   useEffect(() => {
     const fetchFlavors = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/sabores');
+        const res = await fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/sabores');
         const data = await res.json();
         if (Array.isArray(data)) {
           setFlavors(data);
@@ -64,7 +64,7 @@ const StorePage = ({ setCurrentView }) => {
     if (cart.length === 0) return;
 
     try {
-      await fetch('http://localhost:3000/api/ventas', {
+      await fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/ventas', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ items: cart })

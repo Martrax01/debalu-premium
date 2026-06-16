@@ -38,23 +38,23 @@ const AdminPage = ({ currentUser, setCurrentView, setCurrentUser }) => {
   const passwordStrength = checkPasswordStrength(newAdminPass);
 
   const fetchData = () => {
-    fetch('http://localhost:3000/api/sabores')
+    fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/sabores')
       .then(r => r.json())
       .then(data => { if (Array.isArray(data)) setFlavors(data); })
       .catch(() => setFlavors([]));
 
-    fetch('http://localhost:3000/api/estadisticas')
+    fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/estadisticas')
       .then(r => r.json())
       .then(data => { if (Array.isArray(data)) setChartData(data); })
       .catch(() => setChartData([]));
 
     if (roleActive === 'gerente') {
-      fetch('http://localhost:3000/api/logs')
+      fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/logs')
         .then(r => r.json())
         .then(data => { if (Array.isArray(data)) setLogs(data); })
         .catch(() => setLogs([]));
 
-      fetch('http://localhost:3000/api/usuarios')
+      fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/usuarios')
         .then(r => r.json())
         .then(data => { if (Array.isArray(data)) setUsersList(data); })
         .catch(() => setUsersList([]));
@@ -72,13 +72,13 @@ const AdminPage = ({ currentUser, setCurrentView, setCurrentUser }) => {
   };
 
   const handleDeleteProduct = async (id) => {
-    await fetch(`http://localhost:3000/api/sabores/${id}`, { method: 'DELETE' });
+    await fetch(`https://crescent-hydrant-diary.ngrok-free.dev/api/sabores/${id}`, { method: 'DELETE' });
     fetchData();
   };
 
   const handleCreateProduct = async (e) => {
     e.preventDefault();
-    await fetch('http://localhost:3000/api/sabores', {
+    await fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/sabores', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: newName, price: newPrice, image: newImage })
@@ -89,7 +89,7 @@ const AdminPage = ({ currentUser, setCurrentView, setCurrentUser }) => {
 
   const handleCreateAdmin = async (e) => {
     e.preventDefault();
-    const res = await fetch('http://localhost:3000/api/register', {
+    const res = await fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: newAdminUser, password: newAdminPass, role: newAdminRole })
@@ -117,13 +117,13 @@ const AdminPage = ({ currentUser, setCurrentView, setCurrentUser }) => {
     }
     
     if (confirm(`¿Está seguro de despedir y borrar a "${nameToDel}" del sistema?`)) {
-      await fetch(`http://localhost:3000/api/usuarios/${id}`, { method: 'DELETE' });
+      await fetch(`https://crescent-hydrant-diary.ngrok-free.dev/api/usuarios/${id}`, { method: 'DELETE' });
       fetchData();
     }
   };
 
   const handleLogout = async () => {
-    await fetch('http://localhost:3000/api/logout', {
+    await fetch('https://crescent-hydrant-diary.ngrok-free.dev', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: usernameActive })

@@ -21,7 +21,7 @@ const Chatbot = () => {
       ]);
     }
     
-    fetch('http://localhost:3000/api/sabores')
+    fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/sabores')
       .then(res => res.json())
       .then(data => { if (Array.isArray(data)) setFlavorsData(data); })
       .catch(() => console.error("Bot offline"));

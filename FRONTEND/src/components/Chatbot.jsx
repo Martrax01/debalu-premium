@@ -90,7 +90,7 @@ const Chatbot = () => {
     }
 
     //CÓMO COMPRAR
-    if (contiene(['como pido', 'como comprar', 'pedir', 'comprar', 'carrito', 'hacer pedido'])) {
+    if (contiene(['como pido', 'como comprar', 'pedir', 'comprar', 'carrito', 'hacer pedido', 'helado', 'helados'])) {
       return "Hacer un pedido es súper fácil:\n1️⃣ Busca el helado que quieras en la página.\n2️⃣ Toca el carrito rosado para añadirlo.\n3️⃣ Abre tu carrito (arriba a la derecha) y dale a 'Continuar al Pago'. 🛍️";
     }
 

@@ -157,7 +157,7 @@ const AdminPage = ({ currentUser, setCurrentView, setCurrentUser }) => {
                   <input required className="w-full p-2 bg-gray-50 border rounded-lg text-sm" value={newAdminUser} onChange={e=>setNewAdminUser(e.target.value)} placeholder="Nombre de usuario" />
                 </div>
                 <div>
-                  <input type="password" required className="w-full p-2 bg-gray-50 border rounded-lg text-sm" value={newAdminPass} onChange={e=>setAdminPass(e.target.value)} placeholder="Contraseña de seguridad" />
+                  <input type="password" required className="w-full p-2 bg-gray-50 border rounded-lg text-sm" value={newAdminPass} onChange={e=>setNewAdminPass(e.target.value)} placeholder="Contraseña de seguridad" />
                   {newAdminPass && (
                     <p className={`text-[11px] font-black mt-1 ${passwordStrength.color}`}>{passwordStrength.label}</p>
                   )}

@@ -5,10 +5,14 @@ const bcrypt = require('bcrypt');
 const { check, validationResult } = require('express-validator');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning']
+}));
+
 app.use(express.json());
 
-// ================= CONEXIÓN A BASE DE DATOS =================
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
@@ -20,7 +24,6 @@ db.connect((err) => {
   if (err) return console.error('❌ Error BD:', err.message);
   console.log('✅ Conectado a MySQL');
 
-  //Tabla Sabores
   db.query(`CREATE TABLE IF NOT EXISTS sabores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,

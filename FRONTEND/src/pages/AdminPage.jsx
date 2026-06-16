@@ -123,7 +123,7 @@ const AdminPage = ({ currentUser, setCurrentView, setCurrentUser }) => {
   };
 
   const handleLogout = async () => {
-    await fetch('https://crescent-hydrant-diary.ngrok-free.dev', {
+    await fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/logout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: usernameActive })

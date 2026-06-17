@@ -25,7 +25,6 @@ const StorePage = ({ setCurrentView }) => {
   useEffect(() => {
     const fetchFlavors = async () => {
       try {
-        // AQUÍ ESTÁ LA CORRECCIÓN: Agregué el header ngrok-skip-browser-warning
         const res = await fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/sabores', {
           headers: {
             'ngrok-skip-browser-warning': 'true'

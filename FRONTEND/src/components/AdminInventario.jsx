@@ -17,7 +17,7 @@ const AdminInventario = ({ flavors, roleActive, fetchData }) => {
       body: JSON.stringify({ name: newName, price: newPrice, image: newImage })
     });
     setNewName(''); setNewPrice(''); setNewImage('/imagen/porciones.jpg');
-    fetchData(); // Actualiza la lista en el padre
+    fetchData();
   };
 
   const handleDeleteProduct = async (id) => {

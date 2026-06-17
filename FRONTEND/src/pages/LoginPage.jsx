@@ -17,7 +17,6 @@ const LoginPage = ({ setCurrentView, setCurrentUser }) => {
     }
     
     try {
-      // Usamos 'res' para que coincida con el código de abajo
       const res = await fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/login', {
         method: 'POST',
         headers: {
@@ -25,8 +24,8 @@ const LoginPage = ({ setCurrentView, setCurrentUser }) => {
             'ngrok-skip-browser-warning': 'true'
         },
         body: JSON.stringify({ 
-            username: username, // Variables corregidas
-            password: password  // Variables corregidas
+            username: username,
+            password: password
         })
       });
       

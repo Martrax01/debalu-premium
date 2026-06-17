@@ -79,7 +79,7 @@ const Chatbot = () => {
       return "Para hablar directamente con nosotros por WhatsApp, solo tienes que tocar el ícono verde de WhatsApp que está flotando abajo a la derecha. ¡Te atenderemos enseguida! 📱";
     }
 
-    //MÉTODOS
+    //METODOS
     if (contiene(['pago', 'pagos', 'pagar', 'qr', 'efectivo', 'tarjeta', 'transferencia', 'metodo', 'cuenta', 'banco'])) {
       return "Aceptamos pagos mediante Transferencia QR (te enviamos el código por WhatsApp) y también en Efectivo (pagas al repartidor cuando llegue tu helado). 💸";
     }
@@ -89,7 +89,7 @@ const Chatbot = () => {
       return "¡Sí! Tenemos servicio de delivery en La Paz. Solo arma tu pedido en el carrito, dale a 'Continuar al Pago' y coordinamos tu dirección exacta por WhatsApp. 🛵";
     }
 
-    //CÓMO COMPRAR
+    //COMO COMPRAR
     if (contiene(['como pido', 'como comprar', 'pedir', 'comprar', 'carrito', 'hacer pedido', 'helado', 'helados'])) {
       return "Hacer un pedido es súper fácil:\n1️⃣ Busca el helado que quieras en la página.\n2️⃣ Toca el carrito rosado para añadirlo.\n3️⃣ Abre tu carrito (arriba a la derecha) y dale a 'Continuar al Pago'. 🛍️";
     }
@@ -105,10 +105,10 @@ const Chatbot = () => {
 
     //HORARIO
     if (contiene(['horario', 'horarios', 'hora', 'atienden', 'abren', 'cierran', 'abierto'])) {
-      return "Atendemos de lunes a domingo desde las 1:00 AM hasta las 06:00 PM.";
+      return "Atendemos de lunes a domingo desde las 01:00 PM hasta las 06:00 PM.";
     } 
 
-    //UBICACIÓN
+    //UBICACION
     if (contiene(['ubicacion', 'donde', 'direccion', 'lugar', 'zona', 'estan', 'sucursal', 'local'])) {
       return "Nuestra central está en la ciudad de La Paz, Bolivia. ¡Pero llegamos a ti gracias a nuestro servicio de delivery!";
     }

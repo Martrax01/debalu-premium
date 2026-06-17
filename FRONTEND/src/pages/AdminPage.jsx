@@ -1,23 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, BarChart2, LogOut, Image as ImageIcon, Trash2, UserPlus, ShieldAlert, Users } from 'lucide-react';
+import { FileText, BarChart2, LogOut, UserPlus, ShieldAlert, Users } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from 'recharts';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import AdminInventario from '../components/AdminInventario';
 
 const AdminPage = ({ currentUser, setCurrentView, setCurrentUser }) => {
   const usernameActive = currentUser?.username || 'Desconocido';
   const roleActive = currentUser?.role || 'empleado';
 
-  const [newName, setNewName] = useState('');
-  const [newPrice, setNewPrice] = useState('');
-  const [newImage, setNewImage] = useState('/imagen/porciones.jpg'); 
-  
   const [newAdminUser, setNewAdminUser] = useState('');
   const [newAdminPass, setNewAdminPass] = useState('');
   const [newAdminRole, setNewAdminRole] = useState('empleado');
   const [adminMsg, setAdminMsg] = useState('');
   const [usersList, setUsersList] = useState([]);
-
+  
   const [flavors, setFlavors] = useState([]);
   const [logs, setLogs] = useState([]);
   const [chartData, setChartData] = useState([]); 
@@ -25,47 +22,25 @@ const AdminPage = ({ currentUser, setCurrentView, setCurrentUser }) => {
   const checkPasswordStrength = (pwd) => {
     if (!pwd) return { label: '', color: 'text-gray-400' };
     if (pwd.length < 6) return { label: '🔴 Débil (Mínimo 6 caracteres)', color: 'text-red-500' };
-    
     const tieneMayuscula = /[A-Z]/.test(pwd);
     const tieneNumero = /[0-9]/.test(pwd);
     const tieneEspecial = /[^A-Za-z0-9]/.test(pwd);
-
-    if (pwd.length >= 8 && tieneMayuscula && tieneNumero && tieneEspecial) {
-      return { label: '🟢 Fuerte (Segura para el sistema)', color: 'text-green-500' };
-    }
+    if (pwd.length >= 8 && tieneMayuscula && tieneNumero && tieneEspecial) return { label: '🟢 Fuerte (Segura para el sistema)', color: 'text-green-500' };
     return { label: '🟡 Intermedia (Añada mayúsculas y símbolos)', color: 'text-yellow-500' };
   };
   const passwordStrength = checkPasswordStrength(newAdminPass);
 
   const fetchData = () => {
-    fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/sabores', {
-      headers: { 'ngrok-skip-browser-warning': 'true' }
-    })
-      .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setFlavors(data); })
-      .catch(() => setFlavors([]));
-
-    fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/estadisticas', {
-      headers: { 'ngrok-skip-browser-warning': 'true' }
-    })
-      .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setChartData(data); })
-      .catch(() => setChartData([]));
+    fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/sabores', { headers: { 'ngrok-skip-browser-warning': 'true' } })
+      .then(r => r.json()).then(data => { if (Array.isArray(data)) setFlavors(data); }).catch(() => setFlavors([]));
+    fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/estadisticas', { headers: { 'ngrok-skip-browser-warning': 'true' } })
+      .then(r => r.json()).then(data => { if (Array.isArray(data)) setChartData(data); }).catch(() => setChartData([]));
 
     if (roleActive === 'gerente') {
-      fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/logs', {
-        headers: { 'ngrok-skip-browser-warning': 'true' }
-      })
-        .then(r => r.json())
-        .then(data => { if (Array.isArray(data)) setLogs(data); })
-        .catch(() => setLogs([]));
-
-      fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/usuarios', {
-        headers: { 'ngrok-skip-browser-warning': 'true' }
-      })
-        .then(r => r.json())
-        .then(data => { if (Array.isArray(data)) setUsersList(data); })
-        .catch(() => setUsersList([]));
+      fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/logs', { headers: { 'ngrok-skip-browser-warning': 'true' } })
+        .then(r => r.json()).then(data => { if (Array.isArray(data)) setLogs(data); }).catch(() => setLogs([]));
+      fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/usuarios', { headers: { 'ngrok-skip-browser-warning': 'true' } })
+        .then(r => r.json()).then(data => { if (Array.isArray(data)) setUsersList(data); }).catch(() => setUsersList([]));
     }
   };
 
@@ -75,63 +50,31 @@ const AdminPage = ({ currentUser, setCurrentView, setCurrentUser }) => {
     const doc = new jsPDF();
     doc.text("Reporte Oficial - Inventario DeBalu", 14, 15);
     const tableData = flavors.map(f => [f.id, f.name, f.price]);
-    doc.autoTable({ startY: 20, head: [['ID', 'Producto', 'Precio']], body: tableData });
+    autoTable(doc, { startY: 20, head: [['ID', 'Producto', 'Precio']], body: tableData });
     doc.save("Reporte_DeBalu.pdf");
-  };
-
-  const handleDeleteProduct = async (id) => {
-    await fetch(`https://crescent-hydrant-diary.ngrok-free.dev/api/sabores/${id}`, { method: 'DELETE' });
-    fetchData();
-  };
-
-  const handleCreateProduct = async (e) => {
-    e.preventDefault();
-    await fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/sabores', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true'
-      },
-      body: JSON.stringify({ name: newName, price: newPrice, image: newImage })
-    });
-    setNewName(''); setNewPrice(''); setNewImage('/imagen/porciones.jpg');
-    fetchData();
   };
 
   const handleCreateAdmin = async (e) => {
     e.preventDefault();
     const res = await fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/register', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true'
-      },
+      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
       body: JSON.stringify({ username: newAdminUser, password: newAdminPass, role: newAdminRole })
     });
     const data = await res.json();
-    
     if (res.ok) {
       setAdminMsg('✅ Cuenta configurada con éxito');
       setNewAdminUser(''); setNewAdminPass('');
       fetchData();
-    } else {
-      setAdminMsg('❌ ' + data.error);
-    }
+    } else setAdminMsg('❌ ' + data.error);
     setTimeout(() => setAdminMsg(''), 4000);
   };
 
   const handleDeleteUser = async (id, nameToDel) => {
-    if (nameToDel === usernameActive) {
-      alert("No puedes eliminar tu propia cuenta en sesión.");
-      return;
-    }
-    if (nameToDel === 'admin') {
-      alert("La cuenta de administración raíz no se puede destruir.");
-      return;
-    }
-    
+    if (nameToDel === usernameActive) return alert("No puedes eliminar tu propia cuenta en sesión.");
+    if (nameToDel === 'admin') return alert("La cuenta de administración raíz no se puede destruir.");
     if (confirm(`¿Está seguro de despedir y borrar a "${nameToDel}" del sistema?`)) {
-      await fetch(`https://crescent-hydrant-diary.ngrok-free.dev/api/usuarios/${id}`, { method: 'DELETE' });
+      await fetch(`https://crescent-hydrant-diary.ngrok-free.dev/api/usuarios/${id}`, { method: 'DELETE', headers: { 'ngrok-skip-browser-warning': 'true' } });
       fetchData();
     }
   };
@@ -139,10 +82,7 @@ const AdminPage = ({ currentUser, setCurrentView, setCurrentUser }) => {
   const handleLogout = async () => {
     await fetch('https://crescent-hydrant-diary.ngrok-free.dev/api/logout', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'ngrok-skip-browser-warning': 'true'
-      },
+      headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
       body: JSON.stringify({ username: usernameActive })
     });
     setCurrentUser(null);
@@ -164,27 +104,18 @@ const AdminPage = ({ currentUser, setCurrentView, setCurrentUser }) => {
           </div>
         </div>
 
-        {roleActive === 'gerente' ? (
+        {roleActive === 'gerente' && (
           <div className="grid md:grid-cols-3 gap-6 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 animate-in fade-in duration-300">
-            
             <div className="md:col-span-1 border-r border-gray-100 md:pr-6">
               <h2 className="text-lg font-black mb-4 flex items-center gap-2 text-gray-800"><UserPlus size={18} className="text-[#E13D7B]"/> Registrar Personal</h2>
               <form onSubmit={handleCreateAdmin} className="space-y-3">
-                <div>
-                  <input required className="w-full p-2 bg-gray-50 border rounded-lg text-sm" value={newAdminUser} onChange={e=>setNewAdminUser(e.target.value)} placeholder="Nombre de usuario" />
-                </div>
-                <div>
-                  <input type="password" required className="w-full p-2 bg-gray-50 border rounded-lg text-sm" value={newAdminPass} onChange={e=>setNewAdminPass(e.target.value)} placeholder="Contraseña de seguridad" />
-                  {newAdminPass && (
-                    <p className={`text-[11px] font-black mt-1 ${passwordStrength.color}`}>{passwordStrength.label}</p>
-                  )}
-                </div>
-                <div>
-                  <select className="w-full p-2 bg-gray-50 border rounded-lg text-sm font-bold text-gray-600" value={newAdminRole} onChange={e=>setNewAdminRole(e.target.value)}>
-                    <option value="empleado">Rango: Empleado</option>
-                    <option value="gerente">Rango: Gerente</option>
-                  </select>
-                </div>
+                <input required className="w-full p-2 bg-gray-50 border rounded-lg text-sm" value={newAdminUser} onChange={e=>setNewAdminUser(e.target.value)} placeholder="Nombre de usuario" />
+                <input type="password" required className="w-full p-2 bg-gray-50 border rounded-lg text-sm" value={newAdminPass} onChange={e=>setNewAdminPass(e.target.value)} placeholder="Contraseña de seguridad" />
+                {newAdminPass && <p className={`text-[11px] font-black mt-1 ${passwordStrength.color}`}>{passwordStrength.label}</p>}
+                <select className="w-full p-2 bg-gray-50 border rounded-lg text-sm font-bold text-gray-600" value={newAdminRole} onChange={e=>setNewAdminRole(e.target.value)}>
+                  <option value="empleado">Rango: Empleado</option>
+                  <option value="gerente">Rango: Gerente</option>
+                </select>
                 <button type="submit" className="w-full bg-gray-900 text-white py-2 rounded-xl text-sm font-bold hover:bg-gray-800 transition">Dar de Alta</button>
               </form>
               {adminMsg && <p className="mt-2 text-xs font-bold text-center">{adminMsg}</p>}
@@ -204,36 +135,17 @@ const AdminPage = ({ currentUser, setCurrentView, setCurrentUser }) => {
                 ))}
               </div>
             </div>
-
           </div>
-        ) : null}
+        )}
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-1">
-            <h2 className="text-xl font-bold mb-4">Añadir Sabor</h2>
-            <form onSubmit={handleCreateProduct} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre</label>
-                <input required className="w-full p-2.5 bg-gray-50 border rounded-lg" value={newName} onChange={e=>setNewName(e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Precio</label>
-                <input required className="w-full p-2.5 bg-gray-50 border rounded-lg" value={newPrice} onChange={e=>setNewPrice(e.target.value)} />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Imagen</label>
-                <input required className="w-full p-2.5 bg-gray-50 border rounded-lg text-sm" value={newImage} onChange={e=>setNewImage(e.target.value)} />
-              </div>
-              <button type="submit" className="bg-[#E13D7B] text-white px-4 py-3 rounded-xl font-bold w-full shadow-md">Publicar Producto</button>
-            </form>
-          </div>
+        <AdminInventario flavors={flavors} roleActive={roleActive} fetchData={fetchData} />
 
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2 flex flex-col">
+        <div className="grid lg:grid-cols-2 gap-6 mt-6">
+          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><BarChart2 size={20} className="text-[#E13D7B]"/> Ventas Reales Confirmadas</h2>
             <div className="flex-1 min-h-[250px] w-full">
               {chartData.length === 0 ? (
-                <div className="h-full flex items-center justify-center text-gray-400 font-medium">No hay ventas registradas en caja aún.</div>
+                <div className="h-full flex items-center justify-center text-gray-400 font-medium">No hay ventas registradas.</div>
               ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData}>
@@ -247,39 +159,12 @@ const AdminPage = ({ currentUser, setCurrentView, setCurrentUser }) => {
               )}
             </div>
           </div>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-6">
-          
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h2 className="text-xl font-bold mb-4">Sabores en Vitrina</h2>
-            <ul className="space-y-3 max-h-72 overflow-y-auto pr-2">
-              {flavors.map(f => (
-                <li key={f.id} className="flex items-center gap-4 bg-gray-50 p-3 rounded-xl border border-gray-100">
-                  <img src={f.image} className="w-12 h-12 rounded-lg object-cover" alt="" />
-                  <div className="flex-1">
-                    <p className="font-bold text-gray-800">{f.name}</p>
-                    <p className="text-[#E13D7B] font-black text-sm">{f.price}</p>
-                  </div>
-                  
-                  {roleActive === 'gerente' ? (
-                    <button onClick={() => handleDeleteProduct(f.id)} className="text-red-500 hover:bg-red-100 p-2 rounded-lg transition" title="Borrado Lógico">
-                      <Trash2 size={18} />
-                    </button>
-                  ) : (
-                    <span className="text-[10px] text-gray-400 font-bold border px-2 py-1 rounded bg-white">Bloqueado</span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
 
           <div className="bg-gray-900 text-green-400 p-6 rounded-2xl shadow-lg border border-gray-800 flex flex-col min-h-[250px]">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)]"></div>
-              Logs de Transacciones y Seguridad
+              Logs de Seguridad
             </h2>
-            
             {roleActive === 'gerente' ? (
               <div className="flex-1 max-h-56 overflow-y-auto text-xs font-mono space-y-2 pr-2">
                 {logs.length === 0 && <p className="text-gray-500">No hay registros.</p>}
@@ -294,12 +179,12 @@ const AdminPage = ({ currentUser, setCurrentView, setCurrentUser }) => {
               <div className="flex-1 flex flex-col items-center justify-center text-center text-gray-500 space-y-2">
                 <ShieldAlert size={36} className="text-red-500 animate-bounce" />
                 <p className="text-sm font-bold text-red-400">ACCESO RESTRINGIDO</p>
-                <p className="text-xs max-w-xs text-gray-400">Su rango de Empleado no tiene permisos para realizar auditorías de red.</p>
+                <p className="text-xs text-gray-400">Su rango no tiene permisos para realizar auditorías.</p>
               </div>
             )}
-
           </div>
         </div>
+
       </div>
     </div>
   );
